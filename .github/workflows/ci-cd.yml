@@ -27,4 +27,5 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          export KUBECONFIG=~/.kube/config
           kubectl apply -f deploy/ -n tp-microservices
