@@ -8,7 +8,7 @@ Le fichier de configuration (Kubeconfig) est stocké dans les GitHub Secrets du 
 
 ### Pour votre machine locale (Mac/Linux) :
 
-1. Récupérez la valeur du secret auprès de Nadim ou via le coffre-fort de l'équipe.
+1. Récupérez la valeur du secret auprès de Nadim
 
 2. Créez un fichier local :
    ```bash
