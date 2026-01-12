@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api-container
-        image: mon-repo/backend-api:latest # (image Sarah))
+        image: ghcr.io/hajarhouari/projet-etl/backend-api:latest # (image Sarah))
         ports:
         - containerPort: 8000 # Le port sur lequel l'API FastAPI d'Ayoub écoute
         volumeMounts:

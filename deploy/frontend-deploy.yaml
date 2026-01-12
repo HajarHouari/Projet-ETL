@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ui-container
-        image: frontend-app:latest
+        image: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
         ports:
         - containerPort: 80
 ---
