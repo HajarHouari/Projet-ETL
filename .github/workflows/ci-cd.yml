@@ -27,10 +27,19 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend-api:latest
+          tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
 
       - name: Show repository structure
         run: ls -R
+      
+      # Build et Push du Frontend
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          # Idem ici
+          tags: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
 
       # CONFIGURATION DE KUBECTL ---
       - name: Setup Kubectl
