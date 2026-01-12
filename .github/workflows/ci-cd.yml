@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  build:
+  build-and-deploy: 
     runs-on: ubuntu-latest
 
     steps:
@@ -15,3 +15,16 @@ jobs:
 
       - name: Show repository structure
         run: ls -R
+
+      # CONFIGURATION DE KUBECTL ---
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # DÉPLOIEMENT SUR LE SERVEUR ---
+      - name: Deploy to IONOS VPS
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          kubectl apply -f deploy/ -n tp-microservices
