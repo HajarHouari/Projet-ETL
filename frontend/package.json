@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "scripts": {
-    "build": "mkdir -p dist && echo '<h1>Hello World</h1>' > dist/index.html"
+    "build": "mkdir -p dist && cp index.html dist/ && cp -r src dist/"
   },
   "dependencies": {}
 }
