@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim # On demande au cluster de nous réserver du stockage
+metadata:
+  name: sqlite-pvc # Le nom que tu utiliseras pour lier ce stockage à ton backend
+spec:
+  accessModes:
+    - ReadWriteOnce # Signifie que le disque peut être lu et modifié par un seul Pod à la fois
+  resources:
+    requests:
+      storage: 1Gi # On réserve 1 Giga-octet
