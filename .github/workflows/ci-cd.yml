@@ -45,7 +45,7 @@ jobs:
           fi
 
       - name: Build and push Frontend
-        if: steps:check_frontend.outputs.has_package == 'true'
+        if: steps.check_frontend.outputs.has_package == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
