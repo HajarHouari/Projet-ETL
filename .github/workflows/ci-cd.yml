@@ -17,7 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # 1. Connexion au registre d'images GitHub
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with: 
@@ -25,7 +24,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Build et Push du Backend
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
@@ -33,7 +31,6 @@ jobs:
           push: true
           tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
 
-      # 3. Build et Push du Frontend (Uniquement si package.json existe)
       - name: Check Frontend files
         id: check_frontend
         run: |
@@ -41,10 +38,10 @@ jobs:
             echo "has_package=true" >> $GITHUB_OUTPUT
           else
             echo "has_package=false" >> $GITHUB_OUTPUT
-            echo "Warning: No package.json found in frontend/. Skipping frontend build."
           fi
 
       - name: Build and push Frontend
+        # Correction de la syntaxe : point au lieu de deux-points
         if: steps.check_frontend.outputs.has_package == 'true'
         uses: docker/build-push-action@v5
         with:
@@ -52,36 +49,34 @@ jobs:
           push: true
           tags: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
 
-      # 4. Installation de Kubectl
       - name: Setup Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      # 5. Déploiement sur Kubernetes
       - name: Deploy to Kubernetes
         run: |
           mkdir -p ~/.kube
           
-          # Correction : Utilisation d'un echo simple car votre secret n'est pas en base64
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          # Utilisation de 'cat <<EOF' pour garantir que le YAML est écrit proprement sans erreurs de guillemets
+          cat <<EOF > ~/.kube/config
+          ${{ secrets.KUBE_CONFIG }}
+          EOF
+          
           chmod 600 ~/.kube/config
           
-          # Création du namespace s'il n'existe pas
-          kubectl create namespace tp-microservices --dry-run=client -o yaml | kubectl apply -f -
+          # Vérification de la validité du fichier
+          kubectl config view > /dev/null
           
           # Application des manifestes
           kubectl apply -f deploy/ -n tp-microservices
           
-          # Forcer le redémarrage des pods pour prendre la nouvelle image
+          # Redémarrage des pods
           kubectl rollout restart deployment/backend-api -n tp-microservices
-          
-          # Redémarrer le frontend seulement s'il a été buildé
           if [ "${{ steps.check_frontend.outputs.has_package }}" = "true" ]; then
             kubectl rollout restart deployment/frontend-app -n tp-microservices
           fi
 
-      # 6. Nettoyage
       - name: Cleanup
         if: always()
         run: rm -rf ~/.kube
