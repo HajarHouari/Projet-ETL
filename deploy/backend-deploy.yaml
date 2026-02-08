@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-etl
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: backend # Sert à lier ce déploiement au Service ci-dessous
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: api-container
+        image: ghcr.io/hajarhouari/projet-etl/backend-api:latest # (image Sarah))
+        ports:
+        - containerPort: 8000 # Le port sur lequel l'API FastAPI d'Ayoub écoute
+        volumeMounts:
+        - name: sqlite-storage
+          mountPath: /app/data # Le dossier DANS le conteneur où le fichier .db sera stocké
+      volumes:
+      - name: sqlite-storage
+        persistentVolumeClaim:
+          claimName: sqlite-pvc # On branche ici le stockage créé dans le premier fichier
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend # Il envoie le trafic vers les Pods qui ont le label "app: backend"
+  ports:
+    - protocol: TCP
+      port: 80 # Le port "public" du service à l'intérieur du cluster
+      targetPort: 8000 # Il redirige vers le port 8000 du conteneur
+  type: ClusterIP # Service interne : seul le Frontend pourra lui parler

@@ -1,0 +1,55 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Connexion automatique à GitHub Packages
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build et Push du Backend
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
+
+      - name: Show repository structure
+        run: ls -R
+      
+      # Build et Push du Frontend
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          # Idem ici
+          tags: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
+
+      # CONFIGURATION DE KUBECTL ---
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # DÉPLOIEMENT SUR LE SERVEUR ---
+      - name: Deploy to IONOS VPS
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          kubectl apply -f deploy/ -n tp-microservices --kubeconfig ~/.kube/config
