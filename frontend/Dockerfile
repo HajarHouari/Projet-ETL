@@ -1,20 +1,21 @@
-# Étape 1 : Construction (Build)
-# On utilise une image Debian (plus stable qu'alpine pour npm install)
-FROM node:20 AS build-stage
+# Étape 1 : Construction (Utilisation de Debian 'slim' pour éviter l'erreur 254)
+FROM node:20-slim AS build-stage
 WORKDIR /app
 
-# On copie les fichiers de dépendances
+# Copie des fichiers de configuration
 COPY package*.json ./
+
+# Installation propre (plus robuste que sur Alpine)
 RUN npm install
 
-# On copie le reste du code et on build
+# Copie du reste du code et création du build
 COPY . .
 RUN npm run build
 
-# Étape 2 : Serveur final (Production)
-# On utilise l'image officielle Nginx
+# Étape 2 : Serveur final léger pour la production
 FROM nginx:alpine
-# On copie les fichiers générés depuis l'étape de build vers le dossier Nginx
+# On copie le résultat du build vers le dossier Nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
