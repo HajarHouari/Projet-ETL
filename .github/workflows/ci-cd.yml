@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # Connexion automatique à GitHub Packages
+      # 1. Connexion au registre d'images GitHub
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -22,7 +22,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build et Push du Backend
+      # 2. Build et Push du Backend
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
@@ -30,27 +30,42 @@ jobs:
           push: true
           tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
 
-      - name: Show repository structure
-        run: ls -R
-      
-      # Build et Push du Frontend
+      # 3. Build et Push du Frontend
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          # Idem ici
           tags: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
 
-      # CONFIGURATION DE KUBECTL ---
+      # 4. Installation de Kubectl
       - name: Setup Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      # DÉPLOIEMENT SUR LE SERVEUR ---
-      - name: Deploy to IONOS VPS
+      # 5. Déploiement sécurisé sur Kubernetes
+      - name: Deploy to Kubernetes
         run: |
+          # Création sécurisée du dossier de config
           mkdir -p ~/.kube
+          
+          # Injection du Kubeconfig restreint (Celui avec le Token SA)
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          kubectl apply -f deploy/ -n tp-microservices --kubeconfig ~/.kube/config
+          chmod 600 ~/.kube/config
+          
+          # Vérification rapide des droits (pour le debug en cas d'échec)
+          echo "Vérification des permissions pour le namespace cible..."
+          kubectl auth can-i create deployments
+          
+          # Application des manifestes
+          # Note: le namespace est déjà défini dans le Kubeconfig qu'on a créé ensemble
+          kubectl apply -f deploy/
+          
+          # Forcer le redémarrage des pods pour prendre en compte la nouvelle image :latest
+          kubectl rollout restart deployment -n tp-microservices
+
+      # 6. Nettoyage (Bonne pratique de sécurité)
+      - name: Cleanup
+        if: always()
+        run: rm -rf ~/.kube
