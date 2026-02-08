@@ -9,20 +9,21 @@ on:
 jobs:
   build-and-deploy: 
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # Connexion automatique à GitHub Packages
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
-        with:
+        with: 
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build et Push du Backend
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
@@ -30,27 +31,49 @@ jobs:
           push: true
           tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
 
-      - name: Show repository structure
-        run: ls -R
-      
-      # Build et Push du Frontend
+      - name: Check Frontend files
+        id: check_frontend
+        run: |
+          if [ -f "frontend/package.json" ]; then
+            echo "has_package=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_package=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Frontend
+        # Correction de la syntaxe : point au lieu de deux-points
+        if: steps.check_frontend.outputs.has_package == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          # Idem ici
           tags: ghcr.io/hajarhouari/projet-etl/frontend-app:latest
 
-      # CONFIGURATION DE KUBECTL ---
       - name: Setup Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      # DÉPLOIEMENT SUR LE SERVEUR ---
-      - name: Deploy to IONOS VPS
+      - name: Deploy to Kubernetes
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          kubectl apply -f deploy/ -n tp-microservices --kubeconfig ~/.kube/config
+          cat << 'EOF' > ~/.kube/config
+          ${{ secrets.KUBE_CONFIG }}
+          EOF
+          chmod 600 ~/.kube/config
+          
+          # Application des manifestes
+          kubectl apply -f deploy/ -n tp-microservices
+          
+          # CORRECTION DES NOMS :
+          # Le nom dans backend-deploy.yaml est "backend-etl"
+          kubectl rollout restart deployment/backend-etl -n tp-microservices
+          
+          # Le nom dans frontend-deploy.yaml est "frontend-ui"
+          if [ "${{ steps.check_frontend.outputs.has_package }}" = "true" ]; then
+            kubectl rollout restart deployment/frontend-ui -n tp-microservices
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf ~/.kube
