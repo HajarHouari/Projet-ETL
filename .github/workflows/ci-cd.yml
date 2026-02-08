@@ -33,8 +33,19 @@ jobs:
           push: true
           tags: ghcr.io/hajarhouari/projet-etl/backend-api:latest
 
-      # 3. Build et Push du Frontend
+      # 3. Build et Push du Frontend (Uniquement si package.json existe)
+      - name: Check Frontend files
+        id: check_frontend
+        run: |
+          if [ -f "frontend/package.json" ]; then
+            echo "has_package=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_package=false" >> $GITHUB_OUTPUT
+            echo "Warning: No package.json found in frontend/. Skipping frontend build."
+          fi
+
       - name: Build and push Frontend
+        if: steps:check_frontend.outputs.has_package == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -47,28 +58,30 @@ jobs:
         with:
           version: 'latest'
 
-      # 5. Déploiement sécurisé sur Kubernetes
+      # 5. Déploiement sur Kubernetes
       - name: Deploy to Kubernetes
         run: |
-          # Création sécurisée du dossier de config
           mkdir -p ~/.kube
           
-          # Injection du Kubeconfig restreint (Celui avec le Token SA)
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          # Correction : Utilisation d'un echo simple car votre secret n'est pas en base64
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
           
-          # Vérification rapide des droits (pour le debug en cas d'échec)
-          echo "Vérification des permissions pour le namespace cible..."
-          kubectl auth can-i create deployments
+          # Création du namespace s'il n'existe pas
+          kubectl create namespace tp-microservices --dry-run=client -o yaml | kubectl apply -f -
           
           # Application des manifestes
-          # Note: le namespace est déjà défini dans le Kubeconfig qu'on a créé ensemble
-          kubectl apply -f deploy/
+          kubectl apply -f deploy/ -n tp-microservices
           
-          # Forcer le redémarrage des pods pour prendre en compte la nouvelle image :latest
-          kubectl rollout restart deployment -n tp-microservices
+          # Forcer le redémarrage des pods pour prendre la nouvelle image
+          kubectl rollout restart deployment/backend-api -n tp-microservices
+          
+          # Redémarrer le frontend seulement s'il a été buildé
+          if [ "${{ steps.check_frontend.outputs.has_package }}" = "true" ]; then
+            kubectl rollout restart deployment/frontend-app -n tp-microservices
+          fi
 
-      # 6. Nettoyage (Bonne pratique de sécurité)
+      # 6. Nettoyage
       - name: Cleanup
         if: always()
         run: rm -rf ~/.kube
