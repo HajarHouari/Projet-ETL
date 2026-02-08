@@ -57,24 +57,21 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           mkdir -p ~/.kube
-          
-          # Utilisation de 'cat <<EOF' pour garantir que le YAML est écrit proprement sans erreurs de guillemets
-          cat <<EOF > ~/.kube/config
+          cat << 'EOF' > ~/.kube/config
           ${{ secrets.KUBE_CONFIG }}
           EOF
-          
           chmod 600 ~/.kube/config
-          
-          # Vérification de la validité du fichier
-          kubectl config view > /dev/null
           
           # Application des manifestes
           kubectl apply -f deploy/ -n tp-microservices
           
-          # Redémarrage des pods
-          kubectl rollout restart deployment/backend-api -n tp-microservices
+          # CORRECTION DES NOMS :
+          # Le nom dans backend-deploy.yaml est "backend-etl"
+          kubectl rollout restart deployment/backend-etl -n tp-microservices
+          
+          # Le nom dans frontend-deploy.yaml est "frontend-ui"
           if [ "${{ steps.check_frontend.outputs.has_package }}" = "true" ]; then
-            kubectl rollout restart deployment/frontend-app -n tp-microservices
+            kubectl rollout restart deployment/frontend-ui -n tp-microservices
           fi
 
       - name: Cleanup
