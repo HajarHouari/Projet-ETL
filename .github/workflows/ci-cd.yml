@@ -54,7 +54,7 @@ jobs:
           mkdir -p ~/.kube
           
           # Injection du Kubeconfig restreint (Celui avec le Token SA)
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
           
           # Vérification rapide des droits (pour le debug en cas d'échec)
