@@ -34,6 +34,7 @@ h1 {
   display: flex;
   gap: 10px;
   padding-top: 6px;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -57,10 +58,16 @@ h1 {
   color: var(--text);
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .tabs {
   display: flex;
   gap: 8px;
   margin: 18px 0 14px;
+  flex-wrap: wrap;
 }
 
 .tab {
@@ -159,6 +166,7 @@ h1 {
   justify-content: space-between;
   gap: 12px;
   padding: 4px 4px 10px;
+  flex-wrap: wrap;
 }
 
 h2 {
@@ -170,6 +178,7 @@ h2 {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .table-wrap {
@@ -182,6 +191,7 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  min-width: 860px;
 }
 
 .table th, .table td {
@@ -212,51 +222,19 @@ h2 {
   margin-top: 6px;
 }
 
-.placeholder {
+/* NEW: filters layout */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
   border: 1px dashed #cbd5e1;
   border-radius: var(--radius);
-  padding: 16px;
-  margin-top: 14px;
+  margin: 10px 0 14px;
 }
 
-.ph-title {
-  font-weight: 750;
-  margin-bottom: 6px;
-}
-
-.ph-text {
-  color: var(--muted);
-  line-height: 1.4;
-}
-
-.chart-skeleton {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  margin-top: 14px;
-  align-items: end;
-  height: 160px;
-  padding: 14px;
-  border: 1px dashed #cbd5e1;
-  border-radius: var(--radius);
-}
-
-.chart-skeleton .bar {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  height: 40%;
-}
-
-.chart-skeleton .bar:nth-child(2) { height: 65%; }
-.chart-skeleton .bar:nth-child(3) { height: 30%; }
-.chart-skeleton .bar:nth-child(4) { height: 85%; }
-.chart-skeleton .bar:nth-child(5) { height: 55%; }
-.chart-skeleton .bar:nth-child(6) { height: 70%; }
-.chart-skeleton .bar:nth-child(7) { height: 45%; }
-
-.settings {
-  max-width: 640px;
+.field {
+  min-width: 180px;
 }
 
 .label {
@@ -267,36 +245,139 @@ h2 {
   color: var(--muted);
 }
 
+.charts-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.charts-1 {
+  margin-top: 14px;
+}
+
+.chart-card {
+  min-height: 260px;
+}
+
+.chart-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chart-title {
+  font-weight: 800;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+.chart-canvas-wrap canvas {
+  width: 100% !important;
+  height: 260px !important;
+}
+
+.settings {
+  max-width: 720px;
+}
+
 .divider {
   height: 1px;
   background: var(--border);
   margin: 16px 0;
 }
 
-.toggle-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  box-shadow: var(--shadow);
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #0b1220;
-}
-
 .footer {
   margin-top: 16px;
   padding: 10px 2px 0;
+}
+
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .charts-2 { grid-template-columns: 1fr; }
+  .cards-2 { grid-template-columns: 1fr; }
+}
+
+.cards-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.cards-2 > * {
+  min-width: 0;
+}
+
+.charts-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.charts-2 > * {
+  min-width: 0;
+}
+
+.charts-1 {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.charts-1 > .card {
+  width: 100%;
+  max-width: 900px;
+}
+
+.chart-card {
+  min-height: 260px;
+}
+
+.chart-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chart-title {
+  font-weight: 800;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+}
+
+
+.invoice-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.invoice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scroll-btns {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .charts-2 { grid-template-columns: 1fr; }
+  .cards-2 { grid-template-columns: 1fr; }
 }
