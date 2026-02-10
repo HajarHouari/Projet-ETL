@@ -5,7 +5,7 @@ export function getApiBaseUrl() {
   const override = (localStorage.getItem(LS_KEY_API_OVERRIDE) || "").trim();
   const envUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
 
-  const picked = override || envUrl || "/api";
+  const picked = override || envUrl || "http://74.208.149.167/api";
   return picked.replace(/\/$/, "");
 }
 
