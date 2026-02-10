@@ -3,10 +3,6 @@ kind: Ingress
 metadata:
   name: cafe-sales-ingress
   namespace: tp-microservices
-  annotations:
-    # On utilise l'annotation de redirection native de l'Ingress Nginx 
-    # ou on laisse Traefik gérer le préfixe si le backend est configuré pour.
-    ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
