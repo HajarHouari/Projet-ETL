@@ -11,7 +11,7 @@ export function getApiBaseUrl() {
   const envUrl = (import.meta.env.VITE_API_BASE_URL || "").trim();
 
   // On définit ici l'URL par défaut pour la production
-  const picked = override || envUrl || "http://74.208.149.167/api";
+  const picked = override || envUrl || "http://74.208.149.167:32761/api";
   
   return picked.replace(/\/$/, "");
 }
