@@ -2,17 +2,16 @@ from sqlalchemy.orm import Session
 from app.models import Sale
 
 def load_data(df, db: Session):
+    # 1. On vide la table proprement
     db.query(Sale).delete()
 
-    for _, row in df.iterrows():
-        sale = Sale(
-            transaction_id=row["transaction_id"],
-            item=row["item"],
-            quantity=row["quantity"],
-            price_per_unit=row["price_per_unit"],
-            total_spent=row["total_spent"],
-            transaction_date=row["transaction_date"]
-        )
-        db.add(sale)
+    # 2. On transforme le DataFrame en liste de dictionnaires
+    # C'est beaucoup plus rapide que d'itérer sur les lignes
+    data_to_insert = df.to_dict(orient="records")
 
+    # 3. On utilise bulk_insert_mappings
+    # Cela génère une seule grosse transaction SQL
+    db.bulk_insert_mappings(Sale, data_to_insert)
+
+    # 4. On valide
     db.commit()

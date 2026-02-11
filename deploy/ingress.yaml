@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cafe-sales-ingress
+  namespace: tp-microservices
+  # Nous avons supprimé toutes les annotations (timeout et middleware) 
+  # car elles causaient des erreurs de parsing ou de ressources manquantes.
+spec:
+  rules:
+  - http:
+      paths:
+      # Route vers l'API Backend
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 80
+      # Route vers l'Interface Frontend
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80

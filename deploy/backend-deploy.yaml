@@ -36,4 +36,4 @@ spec:
     - protocol: TCP
       port: 80 # Le port "public" du service à l'intérieur du cluster
       targetPort: 8000 # Il redirige vers le port 8000 du conteneur
-  type: ClusterIP # Service interne : seul le Frontend pourra lui parler
+  type: NodePort # Service interne : seul le Frontend pourra lui parler
