@@ -3,13 +3,13 @@ kind: Ingress
 metadata:
   name: cafe-sales-ingress
   namespace: tp-microservices
-  annotations:
-    # Augmente le timeout à 5 minutes (300 secondes)
-    traefik.ingress.kubernetes.io/router.timeout: "300s"
+  # Nous avons supprimé toutes les annotations (timeout et middleware) 
+  # car elles causaient des erreurs de parsing ou de ressources manquantes.
 spec:
   rules:
   - http:
       paths:
+      # Route vers l'API Backend
       - path: /api
         pathType: Prefix
         backend:
@@ -17,6 +17,7 @@ spec:
             name: backend-service
             port:
               number: 80
+      # Route vers l'Interface Frontend
       - path: /
         pathType: Prefix
         backend:
