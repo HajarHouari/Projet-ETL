@@ -31,7 +31,7 @@ Le moyen le plus simple de lancer le projet localement est d'utiliser Docker Com
 
 3. Accéder aux services :
    - **Frontend** : http://localhost:3000
-   - **Backend (API)** : http://localhost:8000/docs
+   - **Backend (API)** : http://localhost:8000
 
 ---
 
@@ -107,6 +107,7 @@ Le pipeline ETL suit les étapes suivantes :
 ## 📝 Licence
 
 Ce projet est à usage éducatif.
+
 
 
 
