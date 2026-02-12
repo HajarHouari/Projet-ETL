@@ -21,7 +21,7 @@ Le moyen le plus simple de lancer le projet localement est d'utiliser Docker Com
 1. Cloner le dépôt :
    ```bash
    git clone <url-du-repo>
-   cd cafe-sales-etl
+   cd Projet-ETL
    ```
 
 2. Lancer les services :
@@ -107,5 +107,6 @@ Le pipeline ETL suit les étapes suivantes :
 ## 📝 Licence
 
 Ce projet est à usage éducatif.
+
 
 
