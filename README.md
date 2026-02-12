@@ -101,14 +101,10 @@ Le pipeline ETL suit les étapes suivantes :
 2. **Transform** — Nettoyage, validation et agrégation des données
 3. **Load** — Chargement des données transformées dans SQLite
 
----
-
-## 📡 API Endpoints
-
-La documentation interactive de l'API est disponible sur : `http://localhost:8000/docs`
 
 ---
 
 ## 📝 Licence
 
 Ce projet est à usage éducatif.
+
