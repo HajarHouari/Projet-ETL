@@ -57,7 +57,7 @@ Le moyen le plus simple de lancer le projet localement est d'utiliser Docker Com
 
 ## 🌐 Déploiement Kubernetes
 
-Le projet est configuré pour être déployé sur un cluster **K3s** (VPS IONOS).
+Le projet est configuré pour être déployé sur un cluster **K3s**.
 
 - **Namespace dédié** : `tp-microservices`
 - **Accès distant** : `http://74.208.149.167:30766`
@@ -107,4 +107,5 @@ Le pipeline ETL suit les étapes suivantes :
 ## 📝 Licence
 
 Ce projet est à usage éducatif.
+
 
